@@ -23,6 +23,7 @@ return {
 
     -- Add your own debuggers here
     'leoluz/nvim-dap-go',
+    'jbyuki/one-small-step-for-vimkind',
   },
   keys = {
     -- Basic debugging keymaps, feel free to change to your liking!
@@ -135,6 +136,18 @@ return {
     dap.listeners.after.event_initialized['dapui_config'] = dapui.open
     dap.listeners.before.event_terminated['dapui_config'] = dapui.close
     dap.listeners.before.event_exited['dapui_config'] = dapui.close
+    dap.listeners.before.attach.dapui_config = function()
+      dapui.open()
+    end
+    dap.listeners.before.launch.dapui_config = function()
+      dapui.open()
+    end
+    dap.listeners.before.event_terminated.dapui_config = function()
+      dapui.close()
+    end
+    dap.listeners.before.event_exited.dapui_config = function()
+      dapui.close()
+    end
 
     -- Install golang specific config
     require('dap-go').setup {
@@ -144,5 +157,37 @@ return {
         detached = vim.fn.has 'win32' == 0,
       },
     }
+
+    -- Install Lua specific config
+    dap.configurations.lua = {
+      {
+        type = 'nlua',
+        request = 'attach',
+        name = 'Attach to running Neovim instance',
+      },
+    }
+
+    dap.adapters.nlua = function(callback, config)
+      callback { type = 'server', host = config.host or '127.0.0.1', port = config.port or 8086 }
+    end
+
+    vim.keymap.set('n', '<leader>db', require('dap').toggle_breakpoint, { noremap = true })
+    vim.keymap.set('n', '<leader>dc', require('dap').continue, { noremap = true })
+    vim.keymap.set('n', '<leader>do', require('dap').step_over, { noremap = true })
+    vim.keymap.set('n', '<leader>di', require('dap').step_into, { noremap = true })
+
+    vim.keymap.set('n', '<leader>dl', function()
+      require('osv').launch { port = 8086 }
+    end, { noremap = true })
+
+    vim.keymap.set('n', '<leader>dw', function()
+      local widgets = require 'dap.ui.widgets'
+      widgets.hover()
+    end)
+
+    vim.keymap.set('n', '<leader>df', function()
+      local widgets = require 'dap.ui.widgets'
+      widgets.centered_float(widgets.frames)
+    end)
   end,
 }
