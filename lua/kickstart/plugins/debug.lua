@@ -24,6 +24,8 @@ return {
     -- Add your own debuggers here
     'leoluz/nvim-dap-go',
     'jbyuki/one-small-step-for-vimkind',
+    'actboy168/lua-debug',
+    'mfussenegger/nvim-dap-python',
   },
   keys = {
     -- Basic debugging keymaps, feel free to change to your liking!
@@ -171,14 +173,30 @@ return {
       callback { type = 'server', host = config.host or '127.0.0.1', port = config.port or 8086 }
     end
 
+    vim.keymap.set('n', '<leader>dl', function()
+      require('osv').launch { port = 8086 }
+    end, { noremap = true })
+
+    -- Python specific config
+    dap.configurations.python = {
+      {
+        type = 'python',
+        request = 'attach',
+        name = 'Attach to running FastAPI',
+        connect = {
+          host = '127.0.0.1',
+          port = 5678,
+        },
+        mode = 'remote',
+        justMyCode = false,
+      },
+    }
+
+    -- Generic keymaps
     vim.keymap.set('n', '<leader>db', require('dap').toggle_breakpoint, { noremap = true })
     vim.keymap.set('n', '<leader>dc', require('dap').continue, { noremap = true })
     vim.keymap.set('n', '<leader>do', require('dap').step_over, { noremap = true })
     vim.keymap.set('n', '<leader>di', require('dap').step_into, { noremap = true })
-
-    vim.keymap.set('n', '<leader>dl', function()
-      require('osv').launch { port = 8086 }
-    end, { noremap = true })
 
     vim.keymap.set('n', '<leader>dw', function()
       local widgets = require 'dap.ui.widgets'
