@@ -26,6 +26,14 @@ return {
     'jbyuki/one-small-step-for-vimkind',
     'actboy168/lua-debug',
     'mfussenegger/nvim-dap-python',
+
+    -- JS/TS Debugger
+    {
+      'microsoft/vscode-js-debug',
+      build = 'npm install --legacy-peer-deps && npx gulp vsDebugServerBundle && mv dist out',
+      lazy = true,
+      version = 'v1.x',
+    },
   },
   keys = {
     -- Basic debugging keymaps, feel free to change to your liking!
@@ -191,6 +199,48 @@ return {
         justMyCode = false,
       },
     }
+
+    -- JS specific configurations
+    local exts = {
+      'javascript',
+      'typescript',
+      'javascriptreact',
+      'typescriptreact',
+      'vue',
+      'svelte',
+    }
+
+    dap.adapters['pwa-node'] = {
+      type = 'server',
+      host = 'localhost',
+      port = '${port}',
+      executable = {
+        command = 'node',
+        args = { vim.fn.stdpath 'data' .. '/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js', '${port}' },
+      },
+    }
+
+    for _, language in ipairs(exts) do
+      dap.configurations[language] = {
+        {
+          type = 'pwa-node',
+          request = 'launch',
+          name = 'Launch File',
+          program = '${file}',
+          cwd = '${workspaceFolder}',
+          console = 'integratedTerminal',
+          skipFiles = { '<node_internals>/**' },
+        },
+        {
+          type = 'pwa-node',
+          request = 'attach',
+          name = 'Attach to Process (port = 9229)',
+          cwd = '${workspaceFolder}',
+          port = 9229,
+          skipFiles = { '<node_internals>/**' },
+        },
+      }
+    end
 
     -- Generic keymaps
     vim.keymap.set('n', '<leader>db', require('dap').toggle_breakpoint, { noremap = true })

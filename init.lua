@@ -167,6 +167,11 @@ vim.opt.scrolloff = 10
 -- See `:help 'confirm'`
 vim.opt.confirm = true
 
+-- Setting up folding
+vim.o.foldmethod = 'expr' -- Use an expression to determine how folds are created
+vim.o.foldexpr = 'nvim_treesitter#foldexpr()'
+vim.o.foldlevel = 99 -- Start with all folds open
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -217,6 +222,48 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
   callback = function()
     vim.highlight.on_yank()
+  end,
+})
+
+vim.api.nvim_create_autocmd('BufReadPost', {
+  pattern = '*.py',
+  callback = function()
+    local file, err = io.open('.python-version', 'r')
+
+    if err then
+      print 'Could not open python-version file.'
+    end
+
+    if file then
+      local file_output = file:read 'all'
+      if not file_output then
+        vim.notify 'No contents on file'
+      end
+      local local_environment = file_output.gsub(file_output, '\n', '')
+      file:close()
+
+      if vim.v.shell_error ~= 0 then
+        vim.notify 'Could not load pyenv local venv'
+      end
+
+      local home_dir = os.getenv 'HOME'
+      local python_path = (home_dir .. '/.pyenv/versions/' .. local_environment .. '/bin/python3')
+
+      if not vim.fn.exists(python_path) then
+        vim.notify 'Python 3 executable missing from pyenv path'
+      end
+
+      vim.g.python3_host_prog = python_path
+
+      require('lspconfig').pyright.setup {
+        settings = {
+          python = {
+            pythonPath = python_path,
+          },
+        },
+      }
+      require('dap-python').setup(python_path)
+    end
   end,
 })
 
@@ -441,6 +488,11 @@ require('lazy').setup({
         builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
           winblend = 10,
           previewer = false,
+          layout_config = {
+            height = 0.4,
+            width = 0.8,
+            prompt_position = 'top',
+          },
         })
       end, { desc = '[/] Fuzzily search in current buffer' })
 
@@ -681,7 +733,6 @@ require('lazy').setup({
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         -- ts_ls = {},
         --
-        volar = {},
         -- TypeScript
         ts_ls = {
           filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
@@ -888,25 +939,36 @@ require('lazy').setup({
     },
   },
 
-  { -- You can easily change to a different colorscheme.
-    -- Change the name of the colorscheme plugin below, and then
-    -- change the command in the config to whatever the name of that colorscheme is.
-    --
-    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
-    priority = 1000, -- Make sure to load this before all the other start plugins.
-    config = function()
-      ---@diagnostic disable-next-line: missing-fields
-      require('tokyonight').setup {
-        styles = {
-          comments = { italic = false }, -- Disable italics in comments
-        },
-      }
+  --{ -- You can easily change to a different colorscheme.
+  --  -- Change the name of the colorscheme plugin below, and then
+  --  -- change the command in the config to whatever the name of that colorscheme is.
+  --  --
+  --  -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
+  --  'folke/tokyonight.nvim',
+  --  priority = 1000, -- Make sure to load this before all the other start plugins.
+  --  config = function()
+  --    ---@diagnostic disable-next-line: missing-fields
+  --    require('tokyonight').setup {
+  --      styles = {
+  --        comments = { italic = false }, -- Disable italics in comments
+  --      },
+  --    }
 
+  --    -- Load the colorscheme here.
+  --    -- Like many other themes, this one has different styles, and you could load
+  --    -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
+  --    vim.cmd.colorscheme 'tokyonight-night'
+  --  end,
+  --},
+  {
+    'kepano/flexoki-neovim',
+    priority = 1000,
+    config = function()
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      -- any other, such as 'flexoki-neovim-storm', 'flexoki-neovim-moon', or 'flexoki-neovim-day'.
+      -- Set colorscheme after options
+      vim.cmd 'colorscheme flexoki-dark'
     end,
   },
 
