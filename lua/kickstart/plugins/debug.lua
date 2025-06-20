@@ -198,6 +198,35 @@ return {
         mode = 'remote',
         justMyCode = false,
       },
+      {
+        type = 'python',
+        request = 'launch',
+        name = 'Launch current file',
+        program = '${file}',
+        cwd = '${workspaceFolder}',
+        console = 'integratedTerminal',
+        justMyCode = false,
+      },
+      {
+        type = 'python',
+        request = 'launch',
+        name = 'Launch current file with args',
+        program = '${file}',
+        cwd = '${workspaceFolder}',
+        args = {},
+        console = 'integratedTerminal',
+        justMyCode = false,
+      },
+      -- launch tests
+      {
+        type = 'python',
+        request = 'launch',
+        name = 'Launch tests',
+        module = 'pytest ${file}',
+        cwd = '${workspaceFolder}',
+        console = 'integratedTerminal',
+        justMyCode = false,
+      },
     }
 
     -- JS specific configurations
