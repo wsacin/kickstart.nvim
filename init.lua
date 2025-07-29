@@ -784,21 +784,22 @@ require('lazy').setup({
             },
           },
         },
-        phpactor = {
-          -- cmd = { ... },
-          -- filetypes = { ... },
-          -- capabilities = {},
-          settings = {
-            phpactor = {
-              enable = true,
-              log_level = 'debug',
-              completion = {
-                enable = true,
-                trigger_on_dot = true,
-              },
-            },
-          },
-        },
+        intelephense = {},
+        -- phpactor = {
+        --   -- cmd = { ... },
+        --   -- filetypes = { ... },
+        --   -- capabilities = {},
+        --   settings = {
+        --     phpactor = {
+        --       enable = true,
+        --       log_level = 'debug',
+        --       completion = {
+        --         enable = true,
+        --         trigger_on_dot = true,
+        --       },
+        --     },
+        --   },
+        -- },
       }
       -- Ensure the servers and tools above are installed
       --
