@@ -12,76 +12,77 @@ return {
     'github/copilot.vim',
   },
   {
-    'CopilotC-Nvim/CopilotChat.nvim',
-    branch = 'main',
-    cmd = 'CopilotChat',
-    opts = function()
-      local user = vim.env.USER or 'User'
-      user = user:sub(1, 1):upper() .. user:sub(2)
-      return {
-        auto_insert_mode = true,
-        question_header = '  ' .. user .. ' ',
-        answer_header = '  Copilot ',
-        window = {
-          width = 0.4,
+    'yetone/avante.nvim',
+    -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
+    -- ⚠️ must add this setting! ! !
+    build = vim.fn.has 'win32' and 'powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false' or 'make',
+    event = 'VeryLazy',
+    version = false, -- Never set this value to "*"! Never!
+    ---@module 'avante'
+    ---@type avante.Config
+    opts = {
+      -- add any opts here
+      -- for example
+      provider = 'copilot',
+      providers = {
+        claude = {
+          endpoint = 'https://api.anthropic.com',
+          model = 'claude-sonnet-4-20250514',
+          timeout = 30000, -- Timeout in milliseconds
+          extra_request_body = {
+            temperature = 0.75,
+            max_tokens = 20480,
+          },
         },
-      }
-    end,
-    keys = {
-      { '<c-s>', '<CR>', ft = 'copilot-chat', desc = 'Submit Prompt', remap = true },
-      { '<leader>a', '', desc = '+ai', mode = { 'n', 'v' } },
-      {
-        '<leader>aa',
-        function()
-          return require('CopilotChat').toggle()
-        end,
-        desc = 'Toggle (CopilotChat)',
-        mode = { 'n', 'v' },
-      },
-      {
-        '<leader>ax',
-        function()
-          return require('CopilotChat').reset()
-        end,
-        desc = 'Clear (CopilotChat)',
-        mode = { 'n', 'v' },
-      },
-      {
-        '<leader>aq',
-        function()
-          vim.ui.input({
-            prompt = 'Quick Chat: ',
-          }, function(input)
-            if input ~= '' then
-              require('CopilotChat').ask(input)
-            end
-          end)
-        end,
-        desc = 'Quick Chat (CopilotChat)',
-        mode = { 'n', 'v' },
-      },
-      {
-        '<leader>ap',
-        function()
-          require('CopilotChat').select_prompt()
-        end,
-        desc = 'Prompt Actions (CopilotChat)',
-        mode = { 'n', 'v' },
+        moonshot = {
+          endpoint = 'https://api.moonshot.ai/v1',
+          model = 'kimi-k2-0711-preview',
+          timeout = 30000, -- Timeout in milliseconds
+          extra_request_body = {
+            temperature = 0.75,
+            max_tokens = 32768,
+          },
+        },
       },
     },
-    config = function(_, opts)
-      local chat = require 'CopilotChat'
-
-      vim.api.nvim_create_autocmd('BufEnter', {
-        pattern = 'copilot-chat',
-        callback = function()
-          vim.opt_local.relativenumber = false
-          vim.opt_local.number = false
-        end,
-      })
-
-      chat.setup(opts)
-    end,
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'MunifTanjim/nui.nvim',
+      --- The below dependencies are optional,
+      'echasnovski/mini.pick', -- for file_selector provider mini.pick
+      'nvim-telescope/telescope.nvim', -- for file_selector provider telescope
+      'hrsh7th/nvim-cmp', -- autocompletion for avante commands and mentions
+      'ibhagwan/fzf-lua', -- for file_selector provider fzf
+      'stevearc/dressing.nvim', -- for input provider dressing
+      'folke/snacks.nvim', -- for input provider snacks
+      'nvim-tree/nvim-web-devicons', -- or echasnovski/mini.icons
+      'zbirenbaum/copilot.lua', -- for providers='copilot'
+      {
+        -- support for image pasting
+        'HakonHarnes/img-clip.nvim',
+        event = 'VeryLazy',
+        opts = {
+          -- recommended settings
+          default = {
+            embed_image_as_base64 = false,
+            prompt_for_file_name = false,
+            drag_and_drop = {
+              insert_mode = true,
+            },
+            -- required for Windows users
+            use_absolute_path = true,
+          },
+        },
+      },
+      {
+        -- Make sure to set this up properly if you have lazy=true
+        'MeanderingProgrammer/render-markdown.nvim',
+        opts = {
+          file_types = { 'markdown', 'Avante' },
+        },
+        ft = { 'markdown', 'Avante' },
+      },
+    },
   },
   {
     'ray-x/go.nvim',
@@ -99,9 +100,9 @@ return {
   },
   {
     'MeanderingProgrammer/render-markdown.nvim',
-    dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' }, -- if you use the mini.nvim suite
+    --dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' }, -- if you use the mini.nvim suite
     -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
-    -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
     ---@module 'render-markdown'
     ---@type render.md.UserConfig
     opts = {},

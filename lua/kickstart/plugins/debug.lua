@@ -271,6 +271,39 @@ return {
       }
     end
 
+    -- Example configuration for PHP debugging
+    dap.adapters.php = {
+      type = 'executable',
+      command = 'node',
+      args = { vim.fn.stdpath 'data' .. '/mason/packages/php-debug-adapter/extension/out/phpDebug.js' },
+    }
+
+    dap.configurations.php = {
+      {
+        -- Configuration optimized for Docker environments
+        type = 'php',
+        request = 'launch',
+        name = 'Docker: Listen for xdebug',
+        port = '9001', -- Default xdebug 3 port
+        log = false, -- Enable logging for Docker debugging
+        pathMappings = {
+          -- More flexible path mappings that can be adjusted for your Docker setup
+          ['/var/www/html'] = '${workspaceFolder}/everest',
+          -- Add more mappings if needed, like:
+          -- ['/app'] = '${workspaceFolder}',
+          -- ['/var/www'] = '${workspaceFolder}',
+        },
+        -- Docker specific settings
+        hostname = 'host.docker.internal', -- Special Docker hostname to connect to host
+        -- Use below instead if connecting from host to container
+        -- hostname = 'localhost',
+        ignore = {
+          -- Ignore vendor files to improve performance
+          '**/vendor/**/*.php',
+        },
+      },
+    }
+
     -- Generic keymaps
     vim.keymap.set('n', '<leader>db', require('dap').toggle_breakpoint, { noremap = true })
     vim.keymap.set('n', '<leader>dc', require('dap').continue, { noremap = true })
