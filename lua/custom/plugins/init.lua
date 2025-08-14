@@ -9,9 +9,6 @@ return {
     opts = {},
   },
   {
-    'github/copilot.vim',
-  },
-  {
     'yetone/avante.nvim',
     -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
     -- ⚠️ must add this setting! ! !
@@ -43,6 +40,7 @@ return {
             max_tokens = 32768,
           },
         },
+        hints = { enabled = false },
       },
     },
     dependencies = {
