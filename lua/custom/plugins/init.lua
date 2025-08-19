@@ -3,6 +3,9 @@
 --
 -- See the kickstart.nvim README for more information
 --return {}
+
+vim.keymap.set('n', '<leader>gn', '<cmd>bnext<cr>', { desc = '[g]oto [n]ext buffer' })
+vim.keymap.set('n', '<leader>gp', '<cmd>bprev<cr>', { desc = '[g]oto [p]revious buffer' })
 return {
   {
     'wsacin/nvim-pyenv-loader',

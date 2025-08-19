@@ -302,6 +302,55 @@ return {
           '**/vendor/**/*.php',
         },
       },
+      {
+        -- PHPUnit: Run current test file
+        type = 'php',
+        request = 'launch',
+        name = 'PHPUnit: Run Current Test File',
+        program = '${workspaceFolder}/vendor/bin/phpunit',
+        args = { '${file}' },
+        cwd = '${workspaceFolder}',
+        env = {
+          XDEBUG_MODE = 'debug',
+        },
+        runtimeArgs = {
+          '-dxdebug.mode=debug',
+          '-dxdebug.start_with_request=yes',
+          '-dxdebug.client_port=9003',
+        },
+        port = '9003',
+        ignore = {
+          '**/vendor/**/*.php',
+        },
+      },
+      {
+        -- PHPUnit: Run tests with filter
+        type = 'php',
+        request = 'launch',
+        name = 'PHPUnit: Run Tests with Filter',
+        program = '${workspaceFolder}/vendor/bin/phpunit',
+        args = function()
+          local filter = vim.fn.input 'Filter (test method/class): '
+          if filter and filter ~= '' then
+            return { '--filter=' .. filter }
+          else
+            return {}
+          end
+        end,
+        cwd = '${workspaceFolder}',
+        env = {
+          XDEBUG_MODE = 'debug',
+        },
+        runtimeArgs = {
+          '-dxdebug.mode=debug',
+          '-dxdebug.start_with_request=yes',
+          '-dxdebug.client_port=9003',
+        },
+        port = '9003',
+        ignore = {
+          '**/vendor/**/*.php',
+        },
+      },
     }
 
     -- Generic keymaps
