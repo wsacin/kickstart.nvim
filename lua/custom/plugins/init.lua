@@ -150,4 +150,62 @@ return {
       return keys
     end,
   },
+  {
+    'stevanmilic/nvim-lspimport',
+    dependencies = { 'neovim/nvim-lspconfig' },
+    event = 'LspAttach',
+    keys = {
+      {
+        '<leader>li',
+        function()
+          require('lspimport').import()
+        end,
+        desc = '[l]sp [i]mport symbol under cursor',
+      },
+      {
+        '<leader>la',
+        function()
+          vim.lsp.buf.code_action()
+        end,
+        desc = '[l]sp code [a]ctions (includes auto import)',
+      },
+      {
+        '<leader>lo',
+        function()
+          require('lspimport').organize_imports()
+        end,
+        desc = '[l]sp [o]rganize imports',
+      },
+    },
+  },
+  {
+    'VPavliashvili/json-nvim',
+    ft = 'json', -- only load for json filetype
+  },
+
+  {
+    'nvimtools/none-ls.nvim',
+    event = { 'BufReadPre', 'BufNewFile' },
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    keys = {
+      {
+        '<leader>ca',
+        function()
+          vim.lsp.buf.code_action()
+        end,
+        desc = 'Code Action',
+      },
+    },
+    config = function()
+      local null_ls = require 'null-ls'
+      null_ls.setup {
+        sources = {
+          -- Python: isort for imports, black for formatting
+          null_ls.builtins.formatting.black,
+          null_ls.builtins.formatting.isort,
+          -- Add more sources as needed (eslint, prettier, etc.)
+        },
+      }
+    end,
+  },
 }
